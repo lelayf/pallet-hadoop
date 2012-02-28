@@ -113,8 +113,7 @@
         configure (phase
                    (h/configure ip-type nn-tag jt-tag properties))]
     {:bootstrap automated-admin-user
-     :configure (phase (java :jdk)
-                       (h/install :cloudera)
+     :configure (phase (h/install :cloudera)
                        configure)
      :reinstall (phase (h/install :cloudera)
                        configure)
