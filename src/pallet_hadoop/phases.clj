@@ -1,5 +1,6 @@
 (ns pallet-hadoop.phases
-  (:use [pallet.resource.remote-file :only (remote-file)]))
+  (:use [pallet.resource.remote-file :only (remote-file)])
+  (:use [clojure.set :only (join)]))
 
 (defn file-limits
   [session fd-limit user-seq]

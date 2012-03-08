@@ -8,7 +8,8 @@
                  [org.cloudhoist/hadoop "0.6.0"]
                  [org.cloudhoist/java "0.5.1"]
                  [org.cloudhoist/automated-admin-user "0.6.0"]]
-  :dev-dependencies [[org.jclouds/jclouds-compute "1.2.1"]
+  :dev-dependencies [[org.jclouds/jclouds-allcompute "1.2.1"]
                      [org.jclouds.driver/jclouds-jsch "1.2.1"]
-                     [org.jclouds.driver/jclouds-log4j "1.2.1"]
-                     [log4j/log4j "1.2.14"]])
+                     [org.clojure/tools.logging "0.2.3"]])
+                    ; [org.jclouds.driver/jclouds-log4j "1.2.1"]
+                    ; [log4j/log4j "1.2.14"]])

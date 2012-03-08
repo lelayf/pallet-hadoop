@@ -3,8 +3,9 @@
         [pallet.crate.automated-admin-user :only (automated-admin-user)]
         [pallet.extensions :only (phase def-phase-fn)]
         [pallet.crate.java :only (java)]
-        [pallet.core :only (make-node lift converge)]
-        [pallet.compute :only (primary-ip nodes-by-tag nodes)])
+        [pallet.core :only (node-spec server-spec group-spec cluster-spec lift converge)]
+        [pallet.compute :only (primary-ip nodes-by-tag nodes)]
+        [pallet.session :only (nodes-with-role)])
   (:require [pallet.core :as core]
             [pallet.action.package :as package]
             [pallet.crate.hadoop :as h]))
@@ -66,7 +67,7 @@
   (filter identity
           (for [role role-seq]
             (some (fn [[tag def]]
-                    (when (some #{role} (get-in def [:node :roles]))
+                    (when (some #{role} (get-in def [:roles]))
                       tag))
                   node-groups))))
 
@@ -127,8 +128,8 @@
   {:post [(some (partial contains? role->phase-map) (:roles %))]}
   (let [{:keys [ip-type node-groups]} cluster
         [jt-tag nn-tag] (get-tags node-groups [:jobtracker :namenode])
-        phase-map (->> (h/merge-config properties (:properties node))
-                       (hadoop-phases ip-type jt-tag nn-tag properties))
+        phase-map (->> (h/merge-config (:properties cluster) (:properties node))
+                       (hadoop-phases ip-type jt-tag nn-tag))
         role-seq  (-> (expand-aliases (:roles node))
                       (conj :default))]
     (server-spec
@@ -145,12 +146,23 @@
               :node-spec (:node-spec node)
               :extends   (hadoop-server-spec cluster node)))
 
+;(comment
 (defn hadoop-cluster-spec
   [cluster-name & {:keys [ip-type node-groups node-spec] :as cluster}]
   (cluster-spec cluster-name
                 :node-spec node-spec
                 :groups (for [[tag node-map] (:node-groups cluster)]
                           (hadoop-group-spec cluster tag node-map))))
+;)
+
+(comment
+(defn hadoop-cluster-spec
+  [cluster-name & {:keys [ip-type node-groups node-spec] :as cluster}]
+  (for [[tag node-map] (:node-groups cluster)]
+    (do (println (str tag "-"))
+    (println node-map))
+    ))
+)
 
 (defn node-group
   "Generates a map representation of a Hadoop node. For example:

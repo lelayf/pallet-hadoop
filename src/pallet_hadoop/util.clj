@@ -1,5 +1,5 @@
 (ns pallet-hadoop.util
-  [clojure.set :only (difference)])
+  (:use [clojure.set :only (difference)]))
 
 ;; ### Utilities
 
