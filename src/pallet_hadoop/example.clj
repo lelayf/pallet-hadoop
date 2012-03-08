@@ -1,4 +1,4 @@
-(ns pallet-hadoop.launch
+(ns pallet-hadoop.example
   (:use pallet-hadoop.node
         [pallet.crate.hadoop :only (hadoop-user)]
         [pallet.extensions :only (def-phase-fn)]
@@ -59,6 +59,7 @@
       (start-cluster cluster
                      :compute compute-service)))
 
+;; untested
 (defn destroy-cluster
   [cluster compute-service]
   (kill-cluster cluster
@@ -74,7 +75,7 @@
                   :node-spec {:image {:image-id "eu-west-1/ami-0f01367b"
                                       :os-family :debian
                                       :min-ram ram-size-in-mb}
-                              :network { :security-groups ["pod"]}}
+                              :network { :security-groups ["my-custom-security-group"]}}
                   :properties {:hdfs-site {:dfs.data.dir "/mnt/dfs/data"
                                            :dfs.name.dir "/mnt/dfs/name"}
                                :mapred-site {:mapred.local.dir "/mnt/hadoop/mapred/local"
@@ -84,10 +85,10 @@
                                              :mapred.tasktracker.reduce.tasks.maximum 3
                                              :mapred.child.java.opts "-Xms1024m"}}))
 
-(def example-cluster (make-example-cluster "pbxbi" 1 (* 4 128)))
+(def example-cluster (make-example-cluster "my-hadoop-cluster" 1 (* 4 128)))
 
 (comment
-  (use 'pallet-hadoop-example.core)
+  (use 'pallet-hadoop.example)
   (bootstrap)
 
   ;; We can define our compute service here...
@@ -101,9 +102,10 @@
   (def ec2-service
     (service :aws))
 
-  ;; Booting the cluster is as simple as the following:
-  (create-cluster example-cluster ec2-service)
+  (boot-cluster  example-cluster :compute ec2-service)
+  (start-cluster example-cluster :compute ec2-service)
 
-  ;; And we can kill it like so:
-  (destroy-cluster example-cluster ec2-service))
-
+  ;; or
+  (create-cluster  example-cluster :compute ec2-service)
+  
+)
